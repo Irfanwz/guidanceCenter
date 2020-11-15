@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ssuet</string>
+
+    <string name="image_chooser">File Chooser</string>
+    <string name="one">Downloading</string>
+    <string name="Two">Completed</string>
+
+</resources>
