@@ -22,7 +22,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -157,19 +159,25 @@ public class MainActivity extends AppCompatActivity {
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
 
-                PDFTools.downloadAndOpenPDF(getApplicationContext(),url,MainActivity.this);
 
-//                DownloadManager.Request request = new DownloadManager.Request(
-//                        Uri.parse(url));
-//                Log.e("Download URl", url);
-//
-//                request.allowScanningByMediaScanner();
-//                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-//                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/file");
-//                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-//                dm.enqueue(request);
-//                Toast.makeText(getApplicationContext(), "Downloading File", //To notify the Client that the file is being downloaded
-//                        Toast.LENGTH_LONG).show();
+                DownloadManager.Request request = new DownloadManager.Request(
+                        Uri.parse(url));
+                request.setMimeType(mimetype);
+                String cookies = CookieManager.getInstance().getCookie(url);
+                request.addRequestHeader("cookie", cookies);
+                request.addRequestHeader("User-Agent", userAgent);
+                request.setDescription("Downloading File...");
+                request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype));
+                request.allowScanningByMediaScanner();
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(
+                                url, contentDisposition, mimetype));
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                dm.enqueue(request);
+                Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
+
+
 
             }
         });
